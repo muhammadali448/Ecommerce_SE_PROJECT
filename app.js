@@ -1,7 +1,9 @@
 require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
-const userRoutes = require("./routes/user"); 
+const cookieParser = require("cookie-parser");
+const morgan = require("morgan");
+const userRoutes = require("./routes/user");
 
 const app = express();
 
@@ -17,8 +19,11 @@ mongoose
   .catch(err => {
     console.log(err.message);
   });
-
-app.use('/api/user', userRoutes);
+app.use(morgan("dev"));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser())
+app.use("/api/user", userRoutes);
 
 const port = process.env.PORT || 8000;
 
