@@ -43,7 +43,7 @@ const userSchema = new mongoose.Schema(
 
 userSchema
   .virtual("password")
-  .set(function (password) {
+  .set(function(password) {
     this._password = password;
     // uuid generate random string
     this.salt = uuidv1();
@@ -54,6 +54,9 @@ userSchema
   });
 
 userSchema.methods = {
+  authenticate: function(password) {
+    return this.encryptPassword(password) === this.hashPassword;
+  },
   encryptPassword: function(password) {
     if (!password) {
       return "";

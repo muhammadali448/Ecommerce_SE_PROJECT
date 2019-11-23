@@ -1,16 +1,18 @@
 const User = require("../models/user");
-const {errorHandler} = require("../helpers/dbErrors");
 
-exports.signup = async (req, res) => {
-  //   console.log("signup body: ", req.body);
+exports.findUserById = async (req, res, next, id) => {
   try {
-    const newUser = new User(req.body);
-    const user = await newUser.save();
-    user.salt = undefined;
-    user.hashPassword =  undefined;
-    res.status(200).json({ user });
+    const user = await User.findById(id).exec();
+    if (!user) {
+      return res.status(404).json({ error: "User not exist" });
+    }
+    req.profile = user;
+    next();
   } catch (error) {
-    res.status(400).json({ error: errorHandler(error) });
+    res.json({ error: error.message });
   }
 };
 
+exports.secret = (req, res) => {
+    res.json({ user: req.profile });
+}
