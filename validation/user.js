@@ -1,4 +1,4 @@
-exports.signinValidation = (req, res, next) => {
+exports.userValidation = (req, res, next) => {
   req.check("email", "Email is required").notEmpty();
   req.check("email", "Email should be valid").isEmail();
   req.check("password", "Password is required").notEmpty();

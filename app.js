@@ -6,6 +6,8 @@ const cookieParser = require("cookie-parser");
 const morgan = require("morgan");
 const authRoutes = require("./routes/auth");
 const userRoutes = require("./routes/user");
+const categoryRoutes = require("./routes/category");
+const productRoutes = require("./routes/product");
 
 const app = express();
 
@@ -28,6 +30,8 @@ app.use(cookieParser())
 app.use(validator());
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
+app.use("/api/category", categoryRoutes);
+app.use("/api/product", productRoutes);
 
 const port = process.env.PORT || 8000;
 
