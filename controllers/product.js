@@ -70,6 +70,28 @@ exports.getProduct = async (req, res) => {
   res.json({ product: req.product });
 };
 
+exports.list = async (req, res) => {
+  try {
+    const { order, sortBy, limit } = req.query;
+    let _order = order ? order : "asc";
+    let _sortBy = sortBy ? sortBy : "_id";
+    let _limit = limit ? limit : 5;
+    const products = await Product.find()
+      .select("-photo")
+
+      .populate("category")
+      .sort([[_sortBy, _order]])
+      .limit(_limit)
+      .exec();
+    if (!products) {
+      return res.status(404).json({ error: "Products not exist" });
+    }
+    res.json(products);
+  } catch (error) {
+    res.json({ error: error.message });
+  }
+};
+
 exports.findProductById = async (req, res, next, id) => {
   try {
     const product = await Product.findById(id).exec();

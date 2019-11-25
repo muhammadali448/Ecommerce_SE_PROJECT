@@ -6,13 +6,15 @@ const {
   findProductById,
   getProduct,
   deleteProduct,
-  updateProduct
+  updateProduct,
+  list
 } = require("../controllers/product");
 const router = express.Router();
 
 router.post("/create/:userId", requireSigin, isAuth, isAdmin, create);
 
 router.get("/get/:productId", getProduct);
+router.get("/list", list);
 router.delete(
   "/delete/:productId/:userId",
   requireSigin,
