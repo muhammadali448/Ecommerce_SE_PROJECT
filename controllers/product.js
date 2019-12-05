@@ -70,15 +70,16 @@ exports.getProduct = async (req, res) => {
   res.json({ product: req.product });
 };
 
+// list?sortBy=sold&order=desc&limit=3
+// list?sortBy=createdAt&order=desc&limit=3
 exports.list = async (req, res) => {
   try {
     const { order, sortBy, limit } = req.query;
     let _order = order ? order : "asc";
     let _sortBy = sortBy ? sortBy : "_id";
-    let _limit = limit ? limit : 5;
+    let _limit = limit ? parseInt(limit) : 5;
     const products = await Product.find()
       .select("-photo")
-
       .populate("category")
       .sort([[_sortBy, _order]])
       .limit(_limit)
@@ -87,6 +88,27 @@ exports.list = async (req, res) => {
       return res.status(404).json({ error: "Products not exist" });
     }
     res.json(products);
+  } catch (error) {
+    res.json({ error: error.message });
+  }
+};
+
+exports.listRelatedProduct = async (req, res) => {
+  try {
+    const { limit } = req.query;
+    const { id, category } = req.product;
+    let _limit = limit ? parseInt(limit) : 5;
+    const relatedProducts = await Product.find({
+      _id: { $ne: id },
+      category
+    })
+      .limit(_limit)
+      .populate("category", "_id name")
+      .exec();
+    if (!relatedProducts) {
+      return res.status(404).json({ error: "Related Products not exist" });
+    }
+    res.json(relatedProducts);
   } catch (error) {
     res.json({ error: error.message });
   }
