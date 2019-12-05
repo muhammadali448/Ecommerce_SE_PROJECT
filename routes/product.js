@@ -8,7 +8,10 @@ const {
   deleteProduct,
   updateProduct,
   list,
-  listRelatedProduct
+  listRelatedProduct,
+  listProductCategories,
+  listSearchProducts,
+  getPhoto
 } = require("../controllers/product");
 const router = express.Router();
 
@@ -16,7 +19,10 @@ router.post("/create/:userId", requireSigin, isAuth, isAdmin, create);
 
 router.get("/get/:productId", getProduct);
 router.get("/list", list);
+router.get("/list/categories", listProductCategories);
+router.get("/photo/:productId", getPhoto);
 router.get("/list/related/:productId", listRelatedProduct);
+router.post("/list/search/products", listSearchProducts);
 router.delete(
   "/delete/:productId/:userId",
   requireSigin,

@@ -13,6 +13,27 @@ exports.findUserById = async (req, res, next, id) => {
   }
 };
 
+exports.readUserInfo = async (req, res) => {
+  req.profile.hashPassword = undefined;
+  req.profile.salt = undefined;
+  return res.json(req.profile);
+};
+
+exports.updateUserInfo = async (req, res) => {
+  try {
+    const updatedUser = await User.findByIdAndUpdate(
+      { _id: req.profile.id },
+      { $set: req.body },
+      { new: true }
+    );
+    updatedUser.hashPassword = undefined;
+    updatedUser.salt = undefined;
+    res.json(updatedUser);
+  } catch (error) {
+    res.json({ error: error.message });
+  }
+};
+
 exports.secret = (req, res) => {
-    res.json({ user: req.profile });
-}
+  res.json({ user: req.profile });
+};
