@@ -4,11 +4,16 @@ const expressJwt = require("express-jwt");
 
 exports.signup = async (req, res) => {
   try {
-    const newUser = new User(req.body);
-    const user = await newUser.save();
-    user.salt = undefined;
-    user.hashPassword = undefined;
-    res.status(200).json({ user });
+    const { email } = req.body;
+    const existUser = await User.findOne({ email });
+    if (!existUser) {
+      const newUser = new User(req.body);
+      const user = await newUser.save();
+      user.salt = undefined;
+      user.hashPassword = undefined;
+      return res.status(200).json({ user });
+    }
+    res.status(400).json({ error: "Email already exist" });
   } catch (error) {
     res.json({ error: error.message });
   }
@@ -51,9 +56,9 @@ exports.isAuth = (req, res, next) => {
   next();
 };
 
-exports.isAdmin =  (req, res, next) => {
+exports.isAdmin = (req, res, next) => {
   if (!req.profile.admin) {
     return res.status(401).json({ error: "Unauthorized" });
   }
   next();
-}
+};
