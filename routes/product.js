@@ -5,6 +5,7 @@ const {
   create,
   findProductById,
   getProduct,
+  getProducts,
   deleteProduct,
   updateProduct,
   list,
@@ -18,6 +19,7 @@ const router = express.Router();
 router.post("/create/:userId", requireSigin, isAuth, isAdmin, create);
 
 router.get("/get/:productId", getProduct);
+router.get("/getAll", getProducts);
 router.get("/list", list);
 router.get("/list/categories", listProductCategories);
 router.get("/photo/:productId", getPhoto);

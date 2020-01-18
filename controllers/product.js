@@ -3,6 +3,17 @@ const formidable = require("formidable");
 const fs = require("fs");
 const _ = require("lodash");
 
+exports.getProducts = async (req, res) => {
+  try {
+    const products = await Product.find()
+      .sort("-createdAt")
+      .exec();
+    res.json(products);
+  } catch (error) {
+    res.json({ error: error.message });
+  }
+};
+
 exports.create = async (req, res) => {
   let form = new formidable.IncomingForm();
   form.keepExtensions = true;
@@ -170,7 +181,7 @@ exports.getPhoto = (req, res, next) => {
     return res.send(req.product.photo.data);
   }
   next();
-}
+};
 
 exports.findProductById = async (req, res, next, id) => {
   try {
