@@ -1,8 +1,13 @@
 const Product = require("../models/product");
+const cloudinary = require("cloudinary");
 const formidable = require("formidable");
 const fs = require("fs");
 const _ = require("lodash");
-
+cloudinary.config({
+  cloud_name: process.env.cloud_name,
+  api_key: process.env.api_key,
+  api_secret: process.env.api_secret
+});
 exports.getProducts = async (req, res) => {
   try {
     const products = await Product.find()
@@ -31,12 +36,18 @@ exports.create = async (req, res) => {
         if (files.photo.size > 1000000) {
           return res.json({ error: "Image should be less than 1mb size" });
         }
-        product.photo.data = fs.readFileSync(files.photo.path);
-        product.photo.contentType = files.photo.type;
+        const result = await cloudinary.v2.uploader.upload(files.photo.path, {
+          public_id: `Ecommerce/${category}/${files.photo.name}`
+        });
+        product.photo.url = result.secure_url;
+        product.photo.id = result.public_id;
+        // product.photo.data = fs.readFileSync(files.photo.path);
+        // product.photo.contentType = files.photo.type;
       }
       const data = await product.save();
       res.json({ data });
     } catch (error) {
+      console.log("error: ", error);
       res.json({ error: error.message });
     }
   });
@@ -56,8 +67,11 @@ exports.updateProduct = async (req, res) => {
         if (files.photo.size > 1000000) {
           return res.json({ error: "Image should be less than 1mb size" });
         }
-        product.photo.data = fs.readFileSync(files.photo.path);
-        product.photo.contentType = files.photo.type;
+        const result = await cloudinary.v2.uploader.upload(files.photo.path, {
+          public_id: `Ecommerce/${category}/${files.photo.name}`
+        });
+        product.photo.url = result.secure_url;
+        product.photo.id = result.public_id;
       }
       const data = await product.save();
       res.json({ data });
@@ -90,7 +104,7 @@ exports.list = async (req, res) => {
     let _sortBy = sortBy ? sortBy : "_id";
     let _limit = limit ? parseInt(limit) : 5;
     const products = await Product.find()
-      .select("-photo")
+      // .select("-photo")
       .populate("category")
       .sort([[_sortBy, _order]])
       .limit(_limit)
@@ -160,7 +174,7 @@ exports.listSearchProducts = async (req, res) => {
       }
     }
     const filterProducts = await Product.find(findArgs)
-      .select("-photo")
+      // .select("-photo")
       .populate("category")
       .sort([[_sortBy, _order]])
       .skip(_skip)
@@ -177,7 +191,8 @@ exports.listSearchProducts = async (req, res) => {
 
 exports.getPhoto = (req, res, next) => {
   if (req.product.photo.data) {
-    res.set("Content-Type", req.product.photo.contentType);
+    res.contentType(req.product.photo.contentType);
+    // res.set("Content-Type", req.product.photo.contentType);
     return res.send(req.product.photo.data);
   }
   next();

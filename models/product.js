@@ -30,10 +30,21 @@ const productSchema = new mongoose.Schema(
       type: Number,
       required: true
     },
+    // photo: {
+    //   data: Buffer,
+    //   contentType: String
+    // },
     photo: {
-      data: Buffer,
-      contentType: String
+      url: {
+        type: String,
+        required: true
+      },
+      id: {
+        type: String,
+        required: true
+      }
     },
+    images: [String],
     shipping: {
       type: Boolean,
       default: false
