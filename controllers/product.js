@@ -1,5 +1,6 @@
 const Product = require("../models/product");
 const cloudinary = require("cloudinary");
+const mongoose = require("mongoose");
 const formidable = require("formidable");
 const fs = require("fs");
 const _ = require("lodash");
@@ -134,6 +135,142 @@ exports.listRelatedProduct = async (req, res) => {
       return res.status(404).json({ error: "Related Products not exist" });
     }
     res.json(relatedProducts);
+  } catch (error) {
+    res.json({ error: error.message });
+  }
+};
+
+exports.productPriceRanges = async (req, res) => {
+  try {
+    var pipeline = [
+      {
+        $match: {
+          category: mongoose.Types.ObjectId(req.params.categoryId)
+        }
+      }
+    ];
+    const ranges = await Product.aggregate(pipeline)
+      .project({
+        price: 1,
+        range: {
+          $cond: [
+            {
+              $and: [{ $gte: ["$price", 1000] }, { $lte: ["$price", 10000] }]
+            },
+            "1000-9999",
+            {
+              $cond: [
+                {
+                  $and: [
+                    { $gte: ["$price", 10000] },
+                    { $lte: ["$price", 20000] }
+                  ]
+                },
+                "10000-19999",
+                {
+                  $cond: [
+                    {
+                      $and: [
+                        { $gte: ["$price", 20000] },
+                        { $lte: ["$price", 29999] }
+                      ]
+                    },
+                    "20000-29999",
+                    {
+                      $cond: [
+                        {
+                          $and: [
+                            { $gte: ["$price", 30000] },
+                            { $lte: ["$price", 39999] }
+                          ]
+                        },
+                        "30000-39999",
+                        {
+                          $cond: [
+                            {
+                              $and: [
+                                { $gte: ["$price", 40000] },
+                                { $lte: ["$price", 49999] }
+                              ]
+                            },
+                            "40000-49999",
+                            {
+                              $cond: [
+                                {
+                                  $and: [
+                                    { $gte: ["$price", 50000] },
+                                    { $lte: ["$price", 59999] }
+                                  ]
+                                },
+                                "50000-59999",
+                                {
+                                  $cond: [
+                                    {
+                                      $and: [
+                                        { $gte: ["$price", 60000] },
+                                        { $lte: ["$price", 69999] }
+                                      ]
+                                    },
+                                    "60000-69999",
+                                    {
+                                      $cond: [
+                                        {
+                                          $and: [
+                                            { $gte: ["$price", 70000] },
+                                            { $lte: ["$price", 79999] }
+                                          ]
+                                        },
+                                        "70000-79999",
+                                        {
+                                          $cond: [
+                                            {
+                                              $and: [
+                                                { $gte: ["$price", 80000] },
+                                                { $lte: ["$price", 89999] }
+                                              ]
+                                            },
+                                            "80000-89999",
+                                            {
+                                              $cond: [
+                                                {
+                                                  $and: [
+                                                    { $gte: ["$price", 90000] },
+                                                    { $lte: ["$price", 99999] }
+                                                  ]
+                                                },
+                                                "90000-99999",
+                                                "100,000 & Above"
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      })
+      .group({
+        _id: "$range",
+        count: { $sum: 1 }
+      })
+      .project({
+        _id: 0,
+        range: "$_id",
+        count: 1
+      });
+    res.json(ranges);
   } catch (error) {
     res.json({ error: error.message });
   }
