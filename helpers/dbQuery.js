@@ -26,7 +26,7 @@ exports.rangesOfProductsPrices_project = {
                       { $lte: ["$price", 10000] }
                     ]
                   },
-                  "1000-9999",
+                  "1000-9,999",
                   {
                     $cond: [
                       {
@@ -35,7 +35,7 @@ exports.rangesOfProductsPrices_project = {
                           { $lte: ["$price", 20000] }
                         ]
                       },
-                      "10000-19999",
+                      "10,000-19,999",
                       {
                         $cond: [
                           {
@@ -44,7 +44,7 @@ exports.rangesOfProductsPrices_project = {
                               { $lte: ["$price", 29999] }
                             ]
                           },
-                          "20000-29999",
+                          "20,000-29,999",
                           {
                             $cond: [
                               {
@@ -53,7 +53,7 @@ exports.rangesOfProductsPrices_project = {
                                   { $lte: ["$price", 39999] }
                                 ]
                               },
-                              "30000-39999",
+                              "30,000-39,999",
                               {
                                 $cond: [
                                   {
@@ -62,7 +62,7 @@ exports.rangesOfProductsPrices_project = {
                                       { $lte: ["$price", 49999] }
                                     ]
                                   },
-                                  "40000-49999",
+                                  "40,000-49,999",
                                   {
                                     $cond: [
                                       {
@@ -71,7 +71,7 @@ exports.rangesOfProductsPrices_project = {
                                           { $lte: ["$price", 59999] }
                                         ]
                                       },
-                                      "50000-59999",
+                                      "50,000-59,999",
                                       {
                                         $cond: [
                                           {
@@ -80,7 +80,7 @@ exports.rangesOfProductsPrices_project = {
                                               { $lte: ["$price", 69999] }
                                             ]
                                           },
-                                          "60000-69999",
+                                          "60,000-69,999",
                                           {
                                             $cond: [
                                               {
@@ -93,7 +93,7 @@ exports.rangesOfProductsPrices_project = {
                                                   }
                                                 ]
                                               },
-                                              "70000-79999",
+                                              "70,000-79,999",
                                               {
                                                 $cond: [
                                                   {
@@ -106,7 +106,7 @@ exports.rangesOfProductsPrices_project = {
                                                       }
                                                     ]
                                                   },
-                                                  "80000-89999",
+                                                  "80,000-89,999",
                                                   {
                                                     $cond: [
                                                       {
@@ -125,7 +125,7 @@ exports.rangesOfProductsPrices_project = {
                                                           }
                                                         ]
                                                       },
-                                                      "90000-99999",
+                                                      "90,000-99,999",
                                                       "100,000 & Above"
                                                     ]
                                                   }

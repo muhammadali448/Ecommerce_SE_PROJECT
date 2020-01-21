@@ -191,11 +191,20 @@ exports.listSearchProducts = async (req, res) => {
       if (filters[key].length > 0) {
         if (key === "price") {
           // gte -  greater than price [0-10]
+          findArgs["$or"] = [];
+          filters[key].forEach(pr => {
+            findArgs["$or"].push(
+              pr[1]
+                ? { price: { $gte: pr[0], $lte: pr[1] } }
+                : { price: { $gte: pr[0] } }
+            );
+          });
           // lte - less than
-          findArgs[key] = {
-            $gte: filters[key][0],
-            $lte: filters[key][1]
-          };
+
+          // findArgs[key] = {
+          //   $gte: filters[key][0],
+          //   $lte: filters[key][1]
+          // };
         } else {
           findArgs[key] = filters[key];
         }
