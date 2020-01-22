@@ -181,11 +181,11 @@ exports.listProductCategories = async (req, res) => {
 
 exports.listSearchProducts = async (req, res) => {
   try {
-    const { order, sortBy, limit, skip, filters } = req.body;
+    const { order, sortBy, productsPerPage, page, filters } = req.body;
     let _order = order ? order : "asc";
     let _sortBy = sortBy ? sortBy : "_id";
-    let _limit = limit ? parseInt(limit) : 5;
-    let _skip = parseInt(skip);
+    let _productsPerPage = productsPerPage ? parseInt(productsPerPage) : 5;
+    let _page = page ? parseInt(page) : 1;
     let findArgs = {};
     for (let key in filters) {
       if (filters[key].length > 0) {
@@ -214,13 +214,19 @@ exports.listSearchProducts = async (req, res) => {
       // .select("-photo")
       .populate("category")
       .sort([[_sortBy, _order]])
-      .skip(_skip)
-      .limit(_limit)
+      .skip(_productsPerPage * _page - _productsPerPage) // (10 * 1) - 1
+      .limit(_productsPerPage) // 10
       .exec();
     if (!filterProducts) {
       return res.status(404).json({ error: "Products not exist" });
     }
-    res.json({ length: filterProducts.length, filterProducts });
+    const noOfProducts = await Product.count(findArgs);
+    res.json({
+      currentPage: _page,
+      noOfResults: noOfProducts,
+      pages: Math.ceil(noOfProducts / _productsPerPage),
+      filterProducts
+    });
   } catch (error) {
     res.json({ error: error.message });
   }
