@@ -13,6 +13,7 @@ const {
   listProductCategories,
   listSearchProducts,
   productPriceRanges,
+  search,
   getPhoto
 } = require("../controllers/product");
 const router = express.Router();
@@ -21,6 +22,7 @@ router.post("/create/:userId", requireSigin, isAuth, isAdmin, create);
 
 router.get("/get/:productId", getProduct);
 router.get("/getAll", getProducts);
+router.get("/search", search);
 router.get("/getRanges/:categoryId", productPriceRanges);
 router.get("/list", list);
 router.get("/list/categories", listProductCategories);

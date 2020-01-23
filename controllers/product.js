@@ -232,6 +232,22 @@ exports.listSearchProducts = async (req, res) => {
   }
 };
 
+exports.search = async (req, res) => {
+  const query = {};
+  try {
+    if (req.query.search) {
+      query.name = { $regex: req.query.search, $options: "i" };
+    }
+    if (req.query.category && req.query.category != "all") {
+      query.category = req.query.category;
+    }
+    const products = await Product.find(query).populate("category").limit(5).exec();
+    res.json(products);
+  } catch (error) {
+    res.json({ error: error.message });
+  }
+};
+
 exports.getPhoto = (req, res, next) => {
   if (req.product.photo.data) {
     res.contentType(req.product.photo.contentType);
