@@ -93,8 +93,7 @@ exports.deleteProduct = async (req, res) => {
 };
 
 exports.getProduct = async (req, res) => {
-  req.product.photo = undefined;
-  res.json({ product: req.product });
+  res.json(req.product);
 };
 
 // list?sortBy=sold&order=desc&limit=3
@@ -241,7 +240,10 @@ exports.search = async (req, res) => {
     if (req.query.category && req.query.category != "all") {
       query.category = req.query.category;
     }
-    const products = await Product.find(query).populate("category").limit(5).exec();
+    const products = await Product.find(query)
+      .populate("category")
+      .limit(5)
+      .exec();
     res.json(products);
   } catch (error) {
     res.json({ error: error.message });
@@ -259,7 +261,9 @@ exports.getPhoto = (req, res, next) => {
 
 exports.findProductById = async (req, res, next, id) => {
   try {
-    const product = await Product.findById(id).exec();
+    const product = await Product.findById(id)
+      .populate("category")
+      .exec();
     if (!product) {
       return res.status(404).json({ error: "Product not exist" });
     }
