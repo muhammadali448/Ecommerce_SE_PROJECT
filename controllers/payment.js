@@ -27,7 +27,7 @@ exports.checkoutBraintree = async (req, res) => {
         submitForSettlement: true
       }
     });
-    
+    res.json(payment);
   } catch (error) {
     res.json({ error: error.message });
   }
