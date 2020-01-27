@@ -55,6 +55,25 @@ exports.create = async (req, res) => {
   });
 };
 
+exports.decreaseQuantityandIncreaseSold = async (req, res, next) => {
+  const { cart } = req.body;
+  try {
+    let bulkOptions = cart.map(({ _id, count }) => ({
+      updateOne: {
+        filter: { _id },
+        update: { $inc: { quantity: -count, sold: +count } }
+      }
+    }));
+    const updateProduct = await Product.bulkWrite(bulkOptions, {});
+    if (!updateProduct) {
+      return res.status(400).json({ error: "Could not updated the product" });
+    }
+    next();
+  } catch (error) {
+    res.json({ error: error.message });
+  }
+};
+
 exports.updateProduct = async (req, res) => {
   let form = new formidable.IncomingForm();
   form.keepExtensions = true;
