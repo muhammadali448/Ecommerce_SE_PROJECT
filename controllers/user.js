@@ -13,6 +13,14 @@ exports.findUserById = async (req, res, next, id) => {
   }
 };
 
+// exports.getOrderHistory = async (req, res) => {
+//   try {
+//     const history = await User.findById(req.profile._id).sort("-createdAt").select("");
+//   } catch (error) {
+//     res.json({ error: error.message });
+//   }
+// };
+
 exports.addOrderToUserHistory = async (req, res, next) => {
   try {
     const { cart, transaction_id, amount } = req.body;
@@ -50,15 +58,41 @@ exports.readUserInfo = async (req, res) => {
 
 exports.updateUserInfo = async (req, res) => {
   try {
-    const updatedUser = await User.findByIdAndUpdate(
-      { _id: req.profile.id },
-      { $set: req.body },
-      { new: true }
-    );
+    const { email, name, currentPassword, newPassword } = req.body;
+    // if (!name || name.trim() === "") {
+    //   return res.status(400).json({ error: "Name is required" });
+    // }
+    // if (!email || email.trim() === "") {
+    //   return res.status(400).json({ error: "Email is required" });
+    // }
+    const existUser = await User.findById(req.profile.id);
+    if (!existUser) {
+      return res.status(404).json({ error: error.message });
+    }
+    if (!existUser.authenticate(currentPassword)) {
+      return res.status(401).json({ error: "Current Password is Incorrect" });
+    }
+    // const fields = {};
+    if (existUser.email !== email) {
+      existUser.email = email;
+    }
+    if (existUser.name !== name) {
+      existUser.name = name;
+    }
+    if (!existUser.authenticate(newPassword)) {
+      existUser.password = newPassword;
+    }
+    const updatedUser = await existUser.save();
+    // const updatedUser = await User.findOneAndUpdate(
+    //   { _id: req.profile.id },
+    //   { $set: { password: "hideit90" } },
+    //   { new: true }
+    // );
     updatedUser.hashPassword = undefined;
     updatedUser.salt = undefined;
     res.json(updatedUser);
   } catch (error) {
+    console.log(error.message);
     res.json({ error: error.message });
   }
 };
