@@ -1,5 +1,5 @@
 const User = require("../models/user");
-
+const { Order } = require("../models/order");
 exports.findUserById = async (req, res, next, id) => {
   try {
     const user = await User.findById(id).exec();
@@ -13,13 +13,17 @@ exports.findUserById = async (req, res, next, id) => {
   }
 };
 
-// exports.getOrderHistory = async (req, res) => {
-//   try {
-//     const history = await User.findById(req.profile._id).sort("-createdAt").select("");
-//   } catch (error) {
-//     res.json({ error: error.message });
-//   }
-// };
+exports.getPurchaseOrderHistory = async (req, res) => {
+  try {
+    const history = await Order.find({ user: req.profile._id })
+      .populate("user", "_id name")
+      .sort("-createdAt")
+      .exec();
+    res.json(history);
+  } catch (error) {
+    res.json({ error: error.message });
+  }
+};
 
 exports.addOrderToUserHistory = async (req, res, next) => {
   try {
@@ -83,11 +87,6 @@ exports.updateUserInfo = async (req, res) => {
       existUser.password = newPassword;
     }
     const updatedUser = await existUser.save();
-    // const updatedUser = await User.findOneAndUpdate(
-    //   { _id: req.profile.id },
-    //   { $set: { password: "hideit90" } },
-    //   { new: true }
-    // );
     updatedUser.hashPassword = undefined;
     updatedUser.salt = undefined;
     res.json(updatedUser);
