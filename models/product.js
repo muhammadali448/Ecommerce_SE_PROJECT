@@ -17,6 +17,10 @@ const productSchema = new mongoose.Schema(
       required: true,
       trim: true
     },
+    brand: {
+      type: String,
+      required: true
+    },
     category: {
       type: ObjectId,
       ref: "Category",
