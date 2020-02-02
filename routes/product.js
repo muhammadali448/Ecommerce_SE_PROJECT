@@ -1,5 +1,6 @@
 const express = require("express");
 const { requireSigin, isAuth, isAdmin } = require("../controllers/auth");
+const { findCategoryById } = require("../controllers/category");
 const { findUserById } = require("../controllers/user");
 const {
   create,
@@ -9,6 +10,7 @@ const {
   deleteProduct,
   updateProduct,
   list,
+  listBrands,
   listRelatedProduct,
   listProductCategories,
   listSearchProducts,
@@ -25,6 +27,7 @@ router.get("/getAll", getProducts);
 router.get("/search", search);
 router.get("/getRanges/:categoryId", productPriceRanges);
 router.get("/list", list);
+router.get("/list/brands/:categoryId", listBrands);
 router.get("/list/categories", listProductCategories);
 router.get("/photo/:productId", getPhoto);
 router.get("/list/related/:productId", listRelatedProduct);
@@ -45,4 +48,5 @@ router.put(
 );
 router.param("userId", findUserById);
 router.param("productId", findProductById);
+router.param("categoryId", findCategoryById);
 module.exports = router;

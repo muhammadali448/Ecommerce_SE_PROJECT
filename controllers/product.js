@@ -21,6 +21,34 @@ exports.getProducts = async (req, res) => {
   }
 };
 
+exports.listBrands = async (req, res) => {
+  try {
+    var pipeline = [
+      {
+        $match: {
+          category: mongoose.Types.ObjectId(req.category._id)
+        }
+      }
+    ];
+    const brands = await Product.aggregate(pipeline)
+      .group({
+        _id: "$brand",
+        count: { $sum: 1 }
+      })
+      .project({
+        _id: 0,
+        range: "$_id",
+        count: 1
+      });
+    if (brands.length === 0) {
+      return res.status(404).json({ error: "No brands found" });
+    }
+    res.json(brands);
+  } catch (error) {
+    res.json({ error: error.message });
+  }
+};
+
 exports.create = async (req, res) => {
   let form = new formidable.IncomingForm();
   form.keepExtensions = true;
@@ -207,6 +235,12 @@ exports.listSearchProducts = async (req, res) => {
     let findArgs = {};
     for (let key in filters) {
       if (filters[key].length > 0) {
+        // if (key === "brand") {
+        //   findArgs["or"] = [];
+        //   filters[key].forEach(br => {
+        //     findArgs["$or"].push(br);
+        //   });
+        // }
         if (key === "price") {
           // gte -  greater than price [0-10]
           findArgs["$or"] = [];
@@ -217,12 +251,6 @@ exports.listSearchProducts = async (req, res) => {
                 : { price: { $gte: pr[0] } }
             );
           });
-          // lte - less than
-
-          // findArgs[key] = {
-          //   $gte: filters[key][0],
-          //   $lte: filters[key][1]
-          // };
         } else {
           findArgs[key] = filters[key];
         }
@@ -238,6 +266,7 @@ exports.listSearchProducts = async (req, res) => {
     if (!filterProducts) {
       return res.status(404).json({ error: "Products not exist" });
     }
+    console.log(filterProducts);
     const noOfProducts = await Product.count(findArgs);
     res.json({
       currentPage: _page,
@@ -246,6 +275,7 @@ exports.listSearchProducts = async (req, res) => {
       filterProducts
     });
   } catch (error) {
+    console.log("error: ", error.message);
     res.json({ error: error.message });
   }
 };
